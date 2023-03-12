@@ -106,11 +106,12 @@ class RpgTableEntry extends HTMLElement {
 
   connectedCallback() {
     const compact = this.parentElement.getAttributeNames().includes("compact") && this.parentElement.getAttribute("compact") != "false";
+    const rollValue = this.getAttribute("roll");
     const weight = parseInt(this.getAttribute("weight")) || 1;
     const end = counter.next(weight).value;
     const shadow = this.shadowRoot;
     const roll = createElement("div", { part: "roll" },
-      `${weight > 1 ? (end - weight + 1) + "–" : ""}${end}`);
+      `${rollValue ? rollValue : ((weight > 1 ? (end - weight + 1) + "–" : "") + end)}`);
     if (!compact) {
       shadow.append(roll);
     }

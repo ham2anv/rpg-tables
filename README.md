@@ -19,12 +19,17 @@ The `<rpg-table>` element defines a random table. It takes two optional attribut
 
 - `compact`: Boolean. If true, will omit the Roll column and show only the
   Results. Default: false.
-- `roll`: A string indicating the dice to use when manually rolling the table. Included in parenthesis in the head of the Roll column.
+- `roll`: A string indicating the dice to use when manually rolling the table.
+  Included in parenthesis in the head of the Roll column. No effect if combined
+  with `compact`.
 
 ## \<rpg-table-entry\>
 The `<rpg-table-entry>` element defines an entry in the random table. It can
-include any flow content as children. It takes one optional attribute: 
+include any flow content as children. It takes two optional attributes: 
 
+- `roll`: A string defining the range of rolls that produce the result. Should
+  be used for all entries or none, and should accompany `weight`. Parent table
+  should also use `roll` to indicate the dice used.
 - `weight`: An integer defining how heavily the entry should be weighted in the 
   random selection. Default: 1.
 
