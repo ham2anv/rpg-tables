@@ -7,36 +7,43 @@
   <title>RPG Table</title>
   <script src="rpg-tables.js"></script>
   <style>
+    rpg-table::part(head) {
+      font-weight: bold;
+    }
+
+    rpg-table-entry::part(roll) {
+      text-align: center;
+    }
+
     rpg-table-entry {
       transition: all 100ms ease-in;
     }
+
     rpg-table-entry.gray-out {
       filter: grayscale(1) contrast(0);
     }
+
     rpg-table-entry.highlight {
       padding-block: 3px;
+      border-block: 1px solid black;
+      margin-block: 2px;
     }
   </style>
 </head>
 <body>
   <rpg-table>
-    <rpg-table-entry>
-      You are eaten by a grue.
-    </rpg-table-entry>
-    <rpg-table-entry>
-      You find a great treasure.
-    </rpg-table-entry>
+    <rpg-table-entry>You are eaten by a grue.</rpg-table-entry>
+    <rpg-table-entry>You find a great treasure.</rpg-table-entry>
     <rpg-table-entry>
       You learn to cherish your relationships above material wealth.
     </rpg-table-entry>
+    <rpg-table-entry>Lorem ipsum, dolor sit amet consectetur adipisicing.</rpg-table-entry>
+    <rpg-table-entry>Lorem ipsum dolor sit amet consectetur.</rpg-table-entry>
     <rpg-table-entry>
-      You are eaten by a grue.
-    </rpg-table-entry>
-    <rpg-table-entry>
-      You find a great treasure.
-    </rpg-table-entry>
-    <rpg-table-entry>
-      You learn to cherish your relationships above material wealth.
+      <ul>
+        <li>You learn to cherish your relationships above material wealth.</li>
+        <li>Lorem ipsum dolor sit amet consectetur adipisicing elit. Est, aliquam.</li>
+      </ul>
     </rpg-table-entry>
   </rpg-table>
 </body>

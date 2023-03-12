@@ -5,26 +5,35 @@ class RpgTable extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: "open" });
-    this.addEventListener("click", event => {
-      this.select(event);
+    this.addEventListener("selectrpgtable", event => {
+      event.stopPropagation();
+      this.select();
+    });
+    this.addEventListener("clearrpgtable", event => {
+      event.stopPropagation();
+      this.clear(event);
     })
   }
 
   connectedCallback() {
     const shadow = this.shadowRoot;
     const roll = this.getAttribute("roll");
-    const container = createElement("div", {class: "rpg-table"});
-    container.append(createElement("div",{class: "rpg-table-head"},`Roll${roll ? ` (${roll})`:""}`), createElement("div",{class: "rpg-table-head"}, "Result"), createElement("slot"));
+    const compact = this.getAttributeNames().includes("compact") && this.getAttribute("compact") != "false";
+    const container = createElement("div", { part: "table" });
+    const headRoll = createElement("div", { part: "head" }, `Roll${roll ? ` (${roll})`:""}`);
+    if (!compact) {
+      container.append(headRoll);
+      headRoll.addEventListener("click", () => this.select());
+    }
+    const result = createElement("div", { part: "head" }, "Result");
+    result.addEventListener("click", () => this.select());
+    container.append(result, createElement("slot"));
     const style = createElement("style",{}, `
-    .rpg-table {
+    ::part(table) {
       display: grid;
       grid-template-columns: auto 1fr;
       column-gap: 0.5rem;
       cursor: pointer;
-    }
-
-    .rpg-table-head {
-      font-weight: bold;
     }
 
     ::slotted(rpg-table-entry) {
@@ -38,25 +47,24 @@ class RpgTable extends HTMLElement {
   }
 
   /**
-   * 
-   * @param {Event} event 
-   * @returns 
+   * Clears the table.
+   * @param {Event} event The triggering event.
    */
-  select(event) {
-    console.log(event.target.classList);
-    if (event.target.classList.contains("highlight")) {
-      event.target.classList.remove("highlight");
-      this.querySelectorAll("rpg-table-entry").forEach(entry => entry.classList.remove("gray-out"));
-      return;
-    }
+  clear(event) {
+    event.target.classList.remove("highlight");
+    this.querySelectorAll("rpg-table-entry").forEach(entry => entry.classList.remove("gray-out"));
+  }
+
+  /**
+   * Randomly selects a table entry.
+   * @param {Event} event 
+   */
+  select() {
     let totalWeight = 0;
     const entries = [...this.querySelectorAll("rpg-table-entry")].map(entry => {
       let weight = parseInt(entry.getAttribute("weight")) || 1;
       totalWeight += weight;
-      return {
-        element: entry,
-        weight, ceiling: totalWeight
-      }
+      return { element: entry, weight, ceiling: totalWeight }
     });
     const randomSelect = Math.floor(Math.random() * totalWeight);
     const selectedEntry = entries.find(row => row.ceiling > randomSelect).element;
@@ -77,31 +85,32 @@ class RpgTableEntry extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: "open" });
+
+    this.addEventListener("click", () => {
+      if (this.classList.contains("highlight"))
+        this.dispatchEvent(new Event("clearrpgtable", { bubbles: true }));
+      else
+        this.dispatchEvent(new Event("selectrpgtable", { bubbles: true }));
+    });
   }
 
   connectedCallback() {
+    const compact = this.parentElement.getAttributeNames().includes("compact") && this.parentElement.getAttribute("compact") != "false";
     const weight = parseInt(this.getAttribute("weight")) || 1;
     const end = counter.next(weight).value;
     const shadow = this.shadowRoot;
-    const roll = createElement(
-      "div",
-      {class: "rpg-table-entry-roll"},
+    const roll = createElement("div", { part: "roll" },
       `${weight > 1 ? (end - weight + 1) + "–" : ""}${end}`);
-    const slot = createElement("div",{},createElement("slot"));
-    const style = createElement("style",{}, `
-    .rpg-table-entry-roll {
-      text-align: center;
+    if (!compact) {
+      shadow.append(roll);
     }
-    `);
-    shadow.append(roll, slot, style);
+    const slot = createElement("div",{part: "result"},createElement("slot"));
+    shadow.append(slot);
   }
 }
 
-
 customElements.define("rpg-table", RpgTable);
 customElements.define("rpg-table-entry", RpgTableEntry);
-
-
 
 /**
  * Creates a new HTML element and returns it.
@@ -121,7 +130,10 @@ function createElement(type, props, ...children) {
   return element;
 }
 
-
+/**
+ * Increments a value.
+ * @returns {Generator}
+ */
 function* incrementer() {
   let total = 0;
   while (true) {
