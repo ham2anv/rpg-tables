@@ -2,6 +2,12 @@ const counter = incrementer();
 counter.next(0);
 
 class RpgTable extends HTMLElement {
+  /**
+   * @event RpgTable#rpgtableselect
+   * @type {CustomEvent}
+   * @property {HTMLElement} detail
+   */
+
   constructor() {
     super();
     this.attachShadow({ mode: "open" });
@@ -57,7 +63,7 @@ class RpgTable extends HTMLElement {
 
   /**
    * Randomly selects a table entry.
-   * @param {Event} event 
+   * @fires RpgTable#rpgtableselect
    */
   select() {
     let totalWeight = 0;
@@ -69,7 +75,6 @@ class RpgTable extends HTMLElement {
     const randomSelect = Math.floor(Math.random() * totalWeight);
     const selectedEntry = entries.find(row => row.ceiling > randomSelect).element;
     entries.forEach(entry => {
-      console.log(entry.element, selectedEntry);
       if (entry.element == selectedEntry) {
         entry.element.classList.remove("gray-out");
         entry.element.classList.add("highlight");
@@ -77,7 +82,12 @@ class RpgTable extends HTMLElement {
         entry.element.classList.remove("highlight");
         entry.element.classList.add("gray-out");
       }
-    })
+    });
+    this.dispatchEvent(new CustomEvent("rpgtableselect", {
+      bubbles: true, 
+      detail: this.querySelector(".highlight")
+    }));
+
   }
 }
 

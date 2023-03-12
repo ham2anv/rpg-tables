@@ -11,6 +11,9 @@ the `<rpg-table>` element with two or more `<rpg-table-entry>` child elements.
 Clicking on a selected entry will clear the selection and reset the table.
 Clicking anywhere else on the table will trigger a new random selection.
 
+On each random selection, the table fires a `rpgtableselect` [CustomEvent]
+with a `detail` value of the selected `<rpg-table-entry>` element.
+
 ## \<rpg-table\>
 The `<rpg-table>` element defines a random table. It takes two optional attributes:
 
@@ -47,4 +50,5 @@ In `<rpg-table-entry>`:
 - `result`: The Result column.
 
 
+[CustomEvent]: https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent
 [pseudo-element]: https://developer.mozilla.org/en-US/docs/Web/CSS/::part
