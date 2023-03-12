@@ -6,7 +6,7 @@ class RpgTable extends HTMLElement {
     super();
     this.attachShadow({ mode: "open" });
     this.addEventListener("click", event => {
-      console.log(event.target);
+      this.select(event);
     })
   }
 
@@ -20,10 +20,10 @@ class RpgTable extends HTMLElement {
       display: grid;
       grid-template-columns: auto 1fr;
       column-gap: 0.5rem;
+      cursor: pointer;
     }
 
     .rpg-table-head {
-      text-align: center;
       font-weight: bold;
     }
 
@@ -35,6 +35,41 @@ class RpgTable extends HTMLElement {
     }
     `);
     shadow.append(container,style);
+  }
+
+  /**
+   * 
+   * @param {Event} event 
+   * @returns 
+   */
+  select(event) {
+    console.log(event.target.classList);
+    if (event.target.classList.contains("highlight")) {
+      event.target.classList.remove("highlight");
+      this.querySelectorAll("rpg-table-entry").forEach(entry => entry.classList.remove("gray-out"));
+      return;
+    }
+    let totalWeight = 0;
+    const entries = [...this.querySelectorAll("rpg-table-entry")].map(entry => {
+      let weight = parseInt(entry.getAttribute("weight")) || 1;
+      totalWeight += weight;
+      return {
+        element: entry,
+        weight, ceiling: totalWeight
+      }
+    });
+    const randomSelect = Math.floor(Math.random() * totalWeight);
+    const selectedEntry = entries.find(row => row.ceiling > randomSelect).element;
+    entries.forEach(entry => {
+      console.log(entry.element, selectedEntry);
+      if (entry.element == selectedEntry) {
+        entry.element.classList.remove("gray-out");
+        entry.element.classList.add("highlight");
+      } else {
+        entry.element.classList.remove("highlight");
+        entry.element.classList.add("gray-out");
+      }
+    })
   }
 }
 
@@ -57,17 +92,8 @@ class RpgTableEntry extends HTMLElement {
     .rpg-table-entry-roll {
       text-align: center;
     }
-    * {
-      cursor: pointer;
-    }
-    `)
+    `);
     shadow.append(roll, slot, style);
-    this.addEventListener("mouseenter", () => {
-      this.setAttribute("style","background-color: lightgray");
-    });
-    this.addEventListener("mouseleave", () => {
-      this.setAttribute("style","")
-    })
   }
 }
 
